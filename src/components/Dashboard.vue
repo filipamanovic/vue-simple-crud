@@ -1,27 +1,31 @@
 <template>
-  <div id="dashboard">
-    <ul class="collection with-header">
-      <li class="collection-header">
-        <h4>Employees</h4>
-      </li>
-      <li v-for="employee in employees" v-bind:key="employee.id"
-        class="collection-item">
-        <div class="chip">{{employee.dept}}</div>
-        {{employee.employee_id}}:
-        {{employee.name}}
-        <router-link v-bind:to="{name: 'view-employee',
+  <div id="dashboard" class="mt-4">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Department</th>
+        <th scope="col">Position</th>
+        <th scope="col">***</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="employee in employees">
+        <td class="font-weight-bold">{{employee.employee_id}}</td>
+        <td>{{employee.name}}</td>
+        <td>{{employee.dept}}</td>
+        <td>{{employee.position}}</td>
+        <td>
+          <router-link v-bind:to="{name: 'view-employee',
                       params:{employee_id: employee.employee_id}}"
-                     class="secondary-content">
-          <i class="fa fa-eye"></i>
-        </router-link>
-      </li>
-    </ul>
-    <div class="fixed-action-btn">
-      <router-link to="/new"
-                   class="btn-floating btn-large red">
-        <i class="fa fa-plus"></i>
-      </router-link>
-    </div>
+                       class="secondary-content btn btn-outline-dark btn-sm">
+            Details
+          </router-link>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 

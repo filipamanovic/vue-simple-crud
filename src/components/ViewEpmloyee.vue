@@ -1,19 +1,36 @@
-<template xmlns="http://www.w3.org/1999/html">
-  <div id="view-employee">
-    <ul class="collection with-header">
-      <li class="collection-header">
-        <h4>{{name}}</h4>
-      </li>
-      <li class="collection-item">EmployeeID: {{employee_id}}</li>
-      <li class="collection-item">Department: {{dept}}</li>
-      <li class="collection-item">Position: {{position}}</li>
-    </ul>
-    <router-link to="/" class="btn gray">Back</router-link>
-    <button class="btn red" @click="deleteEmployee">Delete</button>
-    <router-link v-bind:to="{name: 'edit-employee', params: {employee_id: employee_id}}"
-                 class="btn green">
-      Edit
-    </router-link>
+<template>
+  <div class="row mt-4">
+    <div class="col-md-6 img">
+      <img src="http://www.terapanthbangalore.org/siteimages/employee_default.png"
+           alt="" class="img-rounded" style="height: 270px; width: auto">
+    </div>
+    <div class="col-md-6 details">
+      <blockquote>
+        <h5>{{name}}</h5>
+        <small><cite title="Source Title">{{position}}, {{dept}}  <i class="icon-map-marker"></i></cite></small>
+      </blockquote>
+      <p>
+        {{email}} <br>
+        www.bootsnipp.com <br>
+        {{dateOfBirth}}
+      </p>
+      <h5>Skills:</h5>
+      <div class="progress mt-2" v-for="skil in skills">
+        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info"
+             role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"
+             :style="'width:' + skil.skillValue * 20 +'%'">{{skil.skillName}}
+        </div>
+      </div>
+      <div class="mt-4">
+        <hr>
+        <router-link v-bind:to="{name: 'edit-employee', params: {employee_id: employee_id}}"
+                     class="btn btn-outline-dark btn-sm">
+          Edit
+        </router-link>
+        <button class="btn btn-outline-dark btn-sm" @click="deleteEmployee">Delete</button>
+        <router-link to="/" class="btn btn-outline-dark btn-sm">Back</router-link>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -23,10 +40,13 @@
     name: 'view-employee',
     data() {
       return {
-        employee_id: null,
+        employee_id: "/",
         name: null,
         dept: null,
-        position: null
+        position: null,
+        skills: null,
+        email: null,
+        dateOfBirth: null
       }
     },
     beforeRouteEnter(to, from, next) {
@@ -38,6 +58,9 @@
               vm.name = doc.data().name;
               vm.dept = doc.data().dept;
               vm.position = doc.data().position;
+              vm.skills = doc.data().skills;
+              vm.email = doc.data().email;
+              vm.dateOfBirth = doc.data().dateOfBirth;
             })
           })
       })
@@ -71,3 +94,16 @@
     }
   }
 </script>
+
+<style>
+  .container .img{
+    text-align:center;
+  }
+  .container .details{
+    border-left:3px solid #ded4da;
+  }
+  .container .details p{
+    font-size:15px;
+    font-weight:bold;
+  }
+</style>
