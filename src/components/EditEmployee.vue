@@ -33,9 +33,21 @@
     </div>
     <div class="form-group">
       <label>Department</label>
-      <input type="text" class="form-control" v-model="employee.department"
-             pattern="[A-z\dđšžćčĐŠŽĆČ\s]{2,20}"
-             title="Only characters and numbers 2 - 20">
+      <select class="form-control" @change="deptSelected($event)" v-model="employee.departments[0]" required>
+        <option v-for="dept, key in departments" :key="key" :value="dept.deptName">{{dept.deptName}}</option>
+      </select>
+    </div>
+    <div class="form-group" v-if="subDept1">
+      <label>Sub department</label>
+      <select class="form-control" @change="subDeptSelected($event)" v-model="employee.departments[1]" required>
+        <option v-for="dept, key in subDept1Data" :key="key">{{dept.subDeptName}}</option>
+      </select>
+    </div>
+    <div class="form-group" v-if="subDept2">
+      <label>Sub sub department</label>
+      <select class="form-control" @change="subSubSelected($event)" v-model="employee.departments[2]" required>
+        <option v-for="dept, key in subDept2Data" :key="key">{{dept.subSubDeptName}}</option>
+      </select>
     </div>
     <div class="form-row">
       <div class="form-group col-md-6">
@@ -97,16 +109,21 @@
         employee: {
           employee_id: '/',
           name: '',
-          department: '',
           position: '',
           email: '',
           dateOfBirth: '',
-          skills: []
+          skills: [],
+          departments: []
         },
         employee_id: '/',
         skills: [],
         marks: [],
-        focusedSkill: ''
+        focusedSkill: '',
+        departments: [],
+        subDept1: false,
+        subDept1Data: [],
+        subDept2: false,
+        subDept2Data: []
       }
     },
     beforeRouteEnter(to, from, next) {
@@ -121,6 +138,7 @@
             vm.employee.email = doc.data().email;
             vm.employee.dateOfBirth = doc.data().dateOfBirth;
             vm.employee.skills = doc.data().skills;
+            vm.employee.departments = doc.data().departments
           })
         })
       });
@@ -139,6 +157,12 @@
         };
         this.marks.push(data)
       }));
+      db.collection('departments').get().then
+      (querySnapshot => {
+        querySnapshot.forEach(doc => {
+          this.departments.push(doc.data());
+        })
+      });
     },
     watch: {
       '$router': 'fetchData'
@@ -155,6 +179,7 @@
             this.employee.email = doc.data().email;
             this.employee.dateOfBirth = doc.data().dateOfBirth;
             this.employee.skills = doc.data().skills;
+            this.employee.departments = doc.data().departments;
           })
         });
       },
@@ -164,11 +189,11 @@
           querySnapshot.forEach(doc => {
             doc.ref.update({
               name: this.employee.name,
-              dept: this.employee.department,
               position: this.employee.position,
               email: this.employee.email,
               dateOfBirth: this.employee.dateOfBirth,
-              skills: this.employee.skills
+              skills: this.employee.skills,
+              departments: this.employee.departments
             }).then(() => {
               this.$router.push({name: 'view-employee',
                 params: {employee_id: this.employee.employee_id}})
@@ -199,6 +224,26 @@
             this.skills.find(s => s.skillName === item.skillName).skillAvailable = false;
           }
         }
+      },
+      deptSelected(event) {
+        if (event.target.value !== undefined) {
+          this.subDept1Data = this.departments.find(d => d.deptName === event.target.value).subDept;
+          this.subDept2 = false;
+          this.employee.departments[0] = event.target.value;
+          this.subDept1 = true;
+        }
+      },
+      subDeptSelected(event) {
+        this.employee.departments[1] = event.target.value;
+        this.subDept2Data = this.subDept1Data.find(d => d.subDeptName === event.target.value).subSubDeptName;
+        if (this.subDept2Data !== undefined) {
+          this.subDept2 = true;
+        } else {
+          this.subDept2 = false;
+        }
+      },
+      subSubSelected($event) {
+        this.employee.departments[2] = event.target.value;
       }
     }
   }
